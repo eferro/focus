@@ -66,11 +66,16 @@ const Timer: React.FC<TimerProps> = ({ type, task, onComplete, onCancel }) => {
             {formatTime(timeLeft)}
           </div>
           
-          <Progress 
-            value={progress} 
-            className="h-2 bg-white/30"
-            indicatorClassName={type === 'pomodoro' ? "bg-focus-teal" : "bg-focus-blue"}
-          />
+          <div className="relative w-full h-2 bg-white/30 rounded-full overflow-hidden">
+            <Progress 
+              value={progress} 
+              className="h-full"
+            />
+            <div 
+              className={`absolute top-0 left-0 h-full ${type === 'pomodoro' ? "bg-focus-teal" : "bg-focus-blue"}`}
+              style={{ width: `${progress}%` }}
+            ></div>
+          </div>
         </div>
         
         <div className="flex justify-center space-x-4 mt-6">

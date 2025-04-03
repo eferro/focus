@@ -1,11 +1,12 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import Timer from './Timer';
 import WeatherDisplay from './WeatherDisplay';
 import TaskInput from './TaskInput';
 import AudioControls from './AudioControls';
 import DisconnectionMode from './DisconnectionMode';
+import { useAudio } from '../hooks/useAudio';
 
 // Array of nature image URLs (normally would come from an API)
 const NATURE_IMAGES = [
@@ -24,8 +25,7 @@ const FocusApp: React.FC = () => {
   const [currentImage, setCurrentImage] = useState('');
   const [focusMode, setFocusMode] = useState<FocusMode>(null);
   const [task, setTask] = useState<string>('');
-  const [audioPlaying, setAudioPlaying] = useState<boolean>(false);
-  const [selectedAudio, setSelectedAudio] = useState<string>('rain');
+  const { isPlaying, currentType, togglePlayback, changeType } = useAudio();
 
   // Initialize with a random nature image
   useEffect(() => {
@@ -80,14 +80,6 @@ const FocusApp: React.FC = () => {
     localStorage.setItem('focusTask', newTask);
   }, []);
 
-  const handleAudioChange = useCallback((type: string) => {
-    setSelectedAudio(type);
-  }, []);
-
-  const toggleAudio = useCallback(() => {
-    setAudioPlaying(prev => !prev);
-  }, []);
-
   // Retrieve task from localStorage on component mount
   useEffect(() => {
     const savedTask = localStorage.getItem('focusTask');
@@ -139,10 +131,10 @@ const FocusApp: React.FC = () => {
 
               <div className="mt-6">
                 <AudioControls 
-                  isPlaying={audioPlaying}
-                  selectedType={selectedAudio}
-                  onToggle={toggleAudio}
-                  onTypeChange={handleAudioChange}
+                  isPlaying={isPlaying}
+                  selectedType={currentType}
+                  onToggle={togglePlayback}
+                  onTypeChange={changeType}
                 />
               </div>
             </div>

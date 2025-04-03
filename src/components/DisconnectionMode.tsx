@@ -86,11 +86,16 @@ const DisconnectionMode: React.FC<DisconnectionModeProps> = ({
             {formatTime(timeLeft)}
           </div>
           
-          <Progress 
-            value={progress} 
-            className="h-2 bg-white/30"
-            indicatorClassName="bg-focus-blue"
-          />
+          <div className="relative w-full h-2 bg-white/30 rounded-full overflow-hidden">
+            <Progress 
+              value={progress} 
+              className="h-full"
+            />
+            <div 
+              className="absolute top-0 left-0 h-full bg-focus-blue"
+              style={{ width: `${progress}%` }}
+            ></div>
+          </div>
         </div>
         
         {hasMovement && (
