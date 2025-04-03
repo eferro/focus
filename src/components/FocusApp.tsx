@@ -25,7 +25,7 @@ const FocusApp: React.FC = () => {
   const [currentImage, setCurrentImage] = useState('');
   const [focusMode, setFocusMode] = useState<FocusMode>(null);
   const [task, setTask] = useState<string>('');
-  const { isPlaying, currentType, togglePlayback, changeType } = useAudio();
+  const { isPlaying, currentType, volume, togglePlayback, changeType, adjustVolume } = useAudio();
 
   // Initialize with a random nature image
   useEffect(() => {
@@ -133,8 +133,10 @@ const FocusApp: React.FC = () => {
                 <AudioControls 
                   isPlaying={isPlaying}
                   selectedType={currentType}
+                  volume={volume}
                   onToggle={togglePlayback}
                   onTypeChange={changeType}
+                  onVolumeChange={adjustVolume}
                 />
               </div>
             </div>

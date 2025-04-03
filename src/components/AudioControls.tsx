@@ -1,15 +1,18 @@
 
 import React from 'react';
-import { Headphones, Music } from 'lucide-react';
+import { Headphones, Music, Volume2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 
 interface AudioControlsProps {
   isPlaying: boolean;
   selectedType: string;
+  volume?: number;
   onToggle: () => void;
   onTypeChange: (type: string) => void;
+  onVolumeChange?: (volume: number) => void;
 }
 
 const AUDIO_OPTIONS = [
@@ -22,9 +25,17 @@ const AUDIO_OPTIONS = [
 const AudioControls: React.FC<AudioControlsProps> = ({ 
   isPlaying, 
   selectedType, 
+  volume = 0.5,
   onToggle, 
-  onTypeChange 
+  onTypeChange,
+  onVolumeChange
 }) => {
+  const handleVolumeChange = (value: number[]) => {
+    if (onVolumeChange) {
+      onVolumeChange(value[0]);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -70,6 +81,22 @@ const AudioControls: React.FC<AudioControlsProps> = ({
           </div>
         ))}
       </RadioGroup>
+
+      {onVolumeChange && (
+        <div className="pt-2">
+          <div className="flex items-center mb-2">
+            <Volume2 className="h-4 w-4 text-white mr-2" />
+            <Label className="text-sm text-white">Volume</Label>
+          </div>
+          <Slider
+            defaultValue={[volume]}
+            max={1}
+            step={0.01}
+            onValueChange={handleVolumeChange}
+            className="w-full"
+          />
+        </div>
+      )}
     </div>
   );
 };

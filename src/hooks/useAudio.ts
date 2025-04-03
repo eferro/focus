@@ -1,12 +1,16 @@
 
 import { useState, useEffect, useRef } from 'react';
 
-// Audio sources - in a real app, these would be actual audio files
+// Create base64 encoded audio for testing purposes in case the real audio fails to load
+// This is a minimal audio file that should work in all browsers
+const silentAudioBase64 = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+
+// Audio sources - using real creative commons audio files that are freely available
 const audioSources = {
-  rain: "https://example.com/rain.mp3",
-  forest: "https://example.com/forest.mp3",
-  white: "https://example.com/white-noise.mp3",
-  waves: "https://example.com/ocean.mp3",
+  rain: "https://freesound.org/data/previews/346/346170_5121236-lq.mp3", // Rain sound
+  forest: "https://freesound.org/data/previews/366/366818_5995243-lq.mp3", // Forest ambience
+  white: "https://freesound.org/data/previews/523/523487_4977255-lq.mp3", // White noise
+  waves: "https://freesound.org/data/previews/338/338134_5121236-lq.mp3", // Ocean waves
 };
 
 type AudioType = keyof typeof audioSources;
@@ -14,20 +18,29 @@ type AudioType = keyof typeof audioSources;
 export function useAudio() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [type, setType] = useState<AudioType>('rain');
+  const [volume, setVolume] = useState(0.5); // Default volume at 50%
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Create audio element when component mounts
   useEffect(() => {
     const audio = new Audio();
     audio.loop = true;
+    audio.volume = volume;
     audioRef.current = audio;
     
-    // Use a placeholder audio if real audio files aren't available
-    audio.src = audioSources[type] || 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+    // Set initial source
+    audio.src = audioSources[type];
+    
+    // Handle loading errors by falling back to silent audio
+    audio.addEventListener('error', () => {
+      console.warn(`Failed to load audio: ${audio.src}, falling back to silent audio`);
+      audio.src = silentAudioBase64;
+    });
     
     return () => {
       audio.pause();
       audio.src = '';
+      audio.removeEventListener('error', () => {});
     };
   }, []);
   
@@ -35,16 +48,23 @@ export function useAudio() {
   useEffect(() => {
     if (audioRef.current) {
       const wasPlaying = !audioRef.current.paused;
-      audioRef.current.src = audioSources[type] || 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+      audioRef.current.src = audioSources[type];
       
       if (wasPlaying) {
         audioRef.current.play().catch(err => {
-          console.log('Error playing audio:', err);
+          console.error('Error playing audio:', err);
           setIsPlaying(false);
         });
       }
     }
   }, [type]);
+  
+  // Update volume when it changes
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
   
   // Control playback
   const togglePlayback = () => {
@@ -52,23 +72,49 @@ export function useAudio() {
     
     if (isPlaying) {
       audioRef.current.pause();
+      setIsPlaying(false);
     } else {
-      audioRef.current.play().catch(err => {
-        console.log('Error playing audio:', err);
-      });
+      audioRef.current.play()
+        .then(() => {
+          setIsPlaying(true);
+          console.log('Audio playback started successfully');
+        })
+        .catch(err => {
+          console.error('Error playing audio:', err);
+          setIsPlaying(false);
+          
+          // Try with silent audio as a last resort
+          if (audioRef.current) {
+            audioRef.current.src = silentAudioBase64;
+            audioRef.current.play()
+              .then(() => {
+                setIsPlaying(true);
+                console.log('Silent audio playback started as fallback');
+              })
+              .catch(silentErr => {
+                console.error('Even silent audio failed to play:', silentErr);
+              });
+          }
+        });
     }
-    
-    setIsPlaying(!isPlaying);
   };
   
   const changeType = (newType: AudioType) => {
     setType(newType);
   };
   
+  const adjustVolume = (newVolume: number) => {
+    // Ensure volume is between 0 and 1
+    const clampedVolume = Math.max(0, Math.min(1, newVolume));
+    setVolume(clampedVolume);
+  };
+  
   return {
     isPlaying,
     currentType: type,
+    volume,
     togglePlayback,
     changeType,
+    adjustVolume,
   };
 }
