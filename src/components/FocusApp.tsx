@@ -166,28 +166,10 @@ const FocusApp: React.FC = () => {
             </div>
             
             {/* Quote */}
-            <div className="absolute bottom-10 w-full text-center">
+            <div className="absolute bottom-20 w-full text-center">
               <p className="text-white/80 text-sm italic">
                 "The greatest project you'll ever work on is you."
               </p>
-            </div>
-            
-            {/* Audio controls - show only when mouse moves */}
-            <div 
-              className={`absolute bottom-0 left-0 right-0 p-4 transition-opacity duration-300 ${
-                showControls ? 'opacity-100' : 'opacity-0'
-              }`}
-            >
-              <div className="max-w-xs mx-auto">
-                <AudioControls 
-                  isPlaying={isPlaying}
-                  selectedType={currentType}
-                  volume={volume}
-                  onToggle={togglePlayback}
-                  onTypeChange={changeType}
-                  onVolumeChange={adjustVolume}
-                />
-              </div>
             </div>
             
             {/* Focus buttons - show only when mouse moves */}
@@ -226,6 +208,24 @@ const FocusApp: React.FC = () => {
             onCancel={() => setFocusMode(null)}
           />
         )}
+      </div>
+      
+      {/* Audio controls - fixed at the bottom of the screen */}
+      <div 
+        className={`fixed bottom-0 left-0 right-0 p-4 transition-opacity duration-300 ${
+          showControls ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <div className="max-w-xs mx-auto">
+          <AudioControls 
+            isPlaying={isPlaying}
+            selectedType={currentType}
+            volume={volume}
+            onToggle={togglePlayback}
+            onTypeChange={changeType}
+            onVolumeChange={adjustVolume}
+          />
+        </div>
       </div>
     </div>
   );
