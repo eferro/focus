@@ -7,6 +7,7 @@ import TaskInput from './TaskInput';
 import AudioControls from './AudioControls';
 import DisconnectionMode from './DisconnectionMode';
 import { useAudio } from '../hooks/useAudio';
+import { useWeather } from '../hooks/useWeather';
 
 // Array of nature image URLs (normally would come from an API)
 const NATURE_IMAGES = [
@@ -26,6 +27,9 @@ const FocusApp: React.FC = () => {
   const [focusMode, setFocusMode] = useState<FocusMode>(null);
   const [task, setTask] = useState<string>('');
   const { isPlaying, currentType, volume, togglePlayback, changeType, adjustVolume } = useAudio();
+  const { weather, time } = useWeather();
+  const [showControls, setShowControls] = useState(false);
+  const [greeting, setGreeting] = useState('');
 
   // Initialize with a random nature image
   useEffect(() => {
@@ -42,6 +46,20 @@ const FocusApp: React.FC = () => {
     
     return () => clearInterval(interval);
   }, []);
+
+  // Set greeting based on time of day
+  useEffect(() => {
+    if (!time) return;
+    
+    const hours = time.getHours();
+    if (hours >= 5 && hours < 12) {
+      setGreeting('Good morning.');
+    } else if (hours >= 12 && hours < 18) {
+      setGreeting('Good afternoon.');
+    } else {
+      setGreeting('Good evening.');
+    }
+  }, [time]);
 
   const handleStartFocus = useCallback((mode: FocusMode) => {
     if (!task && (mode === 'pomodoro' || mode === 'disconnection')) {
@@ -88,48 +106,79 @@ const FocusApp: React.FC = () => {
     }
   }, []);
 
+  // Format time to HH:MM
+  const formatTime = () => {
+    if (!time) return '--:--';
+    const hours = time.getHours().toString().padStart(2, '0');
+    const minutes = time.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+
   return (
-    <div className="min-h-screen w-full relative flex flex-col overflow-hidden">
+    <div 
+      className="h-screen w-screen relative flex flex-col overflow-hidden"
+      onMouseMove={() => setShowControls(true)}
+      onMouseLeave={() => setTimeout(() => setShowControls(false), 3000)}
+    >
       {/* Background Image */}
       <div 
         className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
         style={{ backgroundImage: `url(${currentImage})`, opacity: 0.9 }}
       ></div>
-      <div className="absolute inset-0 bg-focus-overlay"></div>
+      <div className="absolute inset-0 bg-black/25"></div>
       
-      {/* Weather & Time */}
-      <div className="absolute top-4 right-4 z-10">
-        <WeatherDisplay />
+      {/* Top navigation */}
+      <div className="absolute top-0 left-0 right-0 flex justify-between p-4 z-20 text-white/80">
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col items-start">
+            <span className="text-sm">Links</span>
+            <span className="text-xs font-light">Focus</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          {weather && (
+            <div className="flex items-center">
+              <span className="text-sm">{Math.round(weather.temp)}°</span>
+              <span className="text-xs ml-1">{weather.city}</span>
+            </div>
+          )}
+        </div>
       </div>
       
       {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center relative z-10 p-4">
+      <div className="flex-1 flex flex-col items-center justify-center relative z-10">
         {focusMode === null ? (
-          <div className="w-full max-w-md animate-fade-in">
-            <div className="glass p-6 rounded-xl">
-              <h1 className="text-3xl font-bold text-white text-center mb-6 drop-shadow-lg">
-                Serene Focus
-              </h1>
-              
-              <TaskInput value={task} onChange={handleTaskChange} />
-              
-              <div className="space-y-4 mt-6">
-                <button
-                  onClick={() => handleStartFocus('pomodoro')}
-                  className="w-full py-3 px-4 bg-white/30 hover:bg-white/40 text-white rounded-lg transition-colors flex items-center justify-center space-x-2"
-                >
-                  <span>Start Pomodoro Focus</span>
-                </button>
-                
-                <button
-                  onClick={() => handleStartFocus('disconnection')}
-                  className="w-full py-3 px-4 bg-white/30 hover:bg-white/40 text-white rounded-lg transition-colors flex items-center justify-center space-x-2"
-                >
-                  <span>Start Disconnection Mode</span>
-                </button>
-              </div>
-
-              <div className="mt-6">
+          <div className="w-full flex flex-col items-center animate-fade-in">
+            {/* Time and greeting */}
+            <div className="text-center mb-16">
+              <h1 className="text-9xl font-extralight text-white tracking-wide mb-2">{formatTime()}</h1>
+              <p className="text-3xl text-white/90 font-light">{greeting}</p>
+            </div>
+            
+            {/* Task input */}
+            <div className="w-full max-w-xl">
+              <TaskInput 
+                value={task} 
+                onChange={handleTaskChange} 
+                placeholder="What is your main goal for today?"
+                className="text-xl text-center"
+              />
+            </div>
+            
+            {/* Quote */}
+            <div className="absolute bottom-10 w-full text-center">
+              <p className="text-white/80 text-sm italic">
+                "The greatest project you'll ever work on is you."
+              </p>
+            </div>
+            
+            {/* Audio controls - show only when mouse moves */}
+            <div 
+              className={`absolute bottom-0 left-0 right-0 p-4 transition-opacity duration-300 ${
+                showControls ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              <div className="max-w-xs mx-auto">
                 <AudioControls 
                   isPlaying={isPlaying}
                   selectedType={currentType}
@@ -138,6 +187,28 @@ const FocusApp: React.FC = () => {
                   onTypeChange={changeType}
                   onVolumeChange={adjustVolume}
                 />
+              </div>
+            </div>
+            
+            {/* Focus buttons - show only when mouse moves */}
+            <div 
+              className={`absolute top-20 right-4 transition-opacity duration-300 ${
+                showControls ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              <div className="flex flex-col space-y-2">
+                <button
+                  onClick={() => handleStartFocus('pomodoro')}
+                  className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg text-sm"
+                >
+                  Pomodoro Focus
+                </button>
+                <button
+                  onClick={() => handleStartFocus('disconnection')}
+                  className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg text-sm"
+                >
+                  Disconnection Mode
+                </button>
               </div>
             </div>
           </div>

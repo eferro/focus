@@ -5,24 +5,25 @@ import { Input } from "@/components/ui/input";
 interface TaskInputProps {
   value: string;
   onChange: (task: string) => void;
+  placeholder?: string;
+  className?: string;
 }
 
-const TaskInput: React.FC<TaskInputProps> = ({ value, onChange }) => {
+const TaskInput: React.FC<TaskInputProps> = ({ 
+  value, 
+  onChange, 
+  placeholder = "Enter your task...",
+  className = ""
+}) => {
   return (
-    <div className="space-y-2">
-      <label className="block text-white text-sm font-medium">
-        What are you focusing on?
-      </label>
+    <div className="space-y-2 w-full">
       <Input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Enter your task..."
-        className="bg-white/20 border-white/30 text-white placeholder:text-white/50 focus:border-white focus:ring-white"
+        placeholder={placeholder}
+        className={`bg-transparent border-x-0 border-t-0 border-b border-white/30 rounded-none text-white placeholder:text-white/50 focus:border-white focus-visible:ring-0 focus-visible:ring-offset-0 py-2 ${className}`}
       />
-      <p className="text-xs text-white/70 italic">
-        Your task will be saved for future sessions
-      </p>
     </div>
   );
 };
