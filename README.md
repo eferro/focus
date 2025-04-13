@@ -62,6 +62,20 @@ This project is built with:
 
 ## How can I deploy this project?
 
+### GitHub Pages Deployment
+
+1. Go to your repository settings on GitHub
+2. Navigate to "Pages" under "Code and automation"
+3. Under "Build and deployment":
+   - Source: Select "GitHub Actions"
+   - Branch: Select "gh-pages" (this will be created automatically)
+4. The site will be available at: `https://<your-username>.github.io/serene-focus-scape/`
+
+The deployment is automated through GitHub Actions. Every push to the main branch will trigger a new deployment.
+
+### Lovable Deployment
+
+Alternatively, you can deploy through Lovable:
 Simply open [Lovable](https://lovable.dev/projects/1f8dee5b-2a48-42db-89a6-f157263c8f21) and click on Share -> Publish.
 
 ## Can I connect a custom domain to my Lovable project?
