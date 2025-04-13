@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { NATURE_IMAGES } from '../assets/images/backgrounds';
 import { Button } from "@/components/ui/button";
 import { Shuffle } from 'lucide-react';
+import { useBackgroundSound } from '../hooks/useBackgroundSound';
+import AudioControl from './AudioControl';
 
 interface BackgroundCanvasProps {
   onMouseMove: () => void;
@@ -13,6 +15,8 @@ const BackgroundCanvas: React.FC<BackgroundCanvasProps> = ({ onMouseMove, onMous
   const [currentImageIndex, setCurrentImageIndex] = useState(() => 
     Math.floor(Math.random() * NATURE_IMAGES.length)
   );
+
+  const { isPlaying, volume, togglePlayback, adjustVolume } = useBackgroundSound();
 
   const changeBackground = useCallback(() => {
     setCurrentImageIndex(current => {
@@ -52,8 +56,7 @@ const BackgroundCanvas: React.FC<BackgroundCanvasProps> = ({ onMouseMove, onMous
       
       {/* Controls layer */}
       <div className="absolute inset-x-0 top-0 z-50">
-        {/* Background Change Button */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-4 items-center">
           <Button
             variant="outline"
             size="icon"
@@ -62,6 +65,13 @@ const BackgroundCanvas: React.FC<BackgroundCanvasProps> = ({ onMouseMove, onMous
           >
             <Shuffle className="h-4 w-4" />
           </Button>
+
+          <AudioControl
+            isPlaying={isPlaying}
+            volume={volume}
+            onToggle={togglePlayback}
+            onVolumeChange={adjustVolume}
+          />
         </div>
       </div>
       
