@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Headphones, Music, Volume2 } from 'lucide-react';
+import { Headphones, Music, Volume2, Loader2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -37,7 +37,7 @@ const AudioControls: React.FC<AudioControlsProps> = ({
   };
 
   return (
-    <div className="glass-dark rounded-lg p-4 space-y-4">
+    <div className="glass-dark rounded-lg p-4 space-y-4 bg-black/40 backdrop-blur-md">
       <div className="flex items-center justify-between">
         <h3 className="text-white/90 font-medium text-sm">Background Sound</h3>
         <Button

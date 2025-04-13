@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import Timer from './Timer';
@@ -9,7 +8,6 @@ import DisconnectionMode from './DisconnectionMode';
 import { useAudio } from '../hooks/useAudio';
 import { useWeather } from '../hooks/useWeather';
 
-// Array of nature image URLs (normally would come from an API)
 const NATURE_IMAGES = [
   'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Moraine_Lake_17092005.jpg/1280px-Moraine_Lake_17092005.jpg',
   'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Clouds_over_the_Atlantic_Ocean.jpg/1280px-Clouds_over_the_Atlantic_Ocean.jpg',
@@ -18,7 +16,6 @@ const NATURE_IMAGES = [
   'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Volcanoimage.jpg/1280px-Volcanoimage.jpg',
 ];
 
-// Focus mode types
 type FocusMode = 'pomodoro' | 'disconnection' | null;
 
 const FocusApp: React.FC = () => {
@@ -26,18 +23,16 @@ const FocusApp: React.FC = () => {
   const [currentImage, setCurrentImage] = useState('');
   const [focusMode, setFocusMode] = useState<FocusMode>(null);
   const [task, setTask] = useState<string>('');
-  const { isPlaying, currentType, volume, togglePlayback, changeType, adjustVolume } = useAudio();
+  const { isPlaying, currentType, volume, audioLoaded, togglePlayback, changeType, adjustVolume } = useAudio();
   const { weather, time } = useWeather();
   const [showControls, setShowControls] = useState(false);
   const [greeting, setGreeting] = useState('');
 
-  // Initialize with a random nature image
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * NATURE_IMAGES.length);
     setCurrentImage(NATURE_IMAGES[randomIndex]);
   }, []);
 
-  // Change image every 5 minutes
   useEffect(() => {
     const interval = setInterval(() => {
       const randomIndex = Math.floor(Math.random() * NATURE_IMAGES.length);
@@ -47,7 +42,6 @@ const FocusApp: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Set greeting based on time of day
   useEffect(() => {
     if (!time) return;
     
@@ -98,7 +92,6 @@ const FocusApp: React.FC = () => {
     localStorage.setItem('focusTask', newTask);
   }, []);
 
-  // Retrieve task from localStorage on component mount
   useEffect(() => {
     const savedTask = localStorage.getItem('focusTask');
     if (savedTask) {
@@ -106,7 +99,6 @@ const FocusApp: React.FC = () => {
     }
   }, []);
 
-  // Format time to HH:MM
   const formatTime = () => {
     if (!time) return '--:--';
     const hours = time.getHours().toString().padStart(2, '0');
@@ -114,20 +106,27 @@ const FocusApp: React.FC = () => {
     return `${hours}:${minutes}`;
   };
 
+  useEffect(() => {
+    if (audioLoaded) {
+      toast({
+        title: "Audio Ready",
+        description: `${currentType.charAt(0).toUpperCase() + currentType.slice(1)} sound is ready to play`,
+      });
+    }
+  }, [audioLoaded, currentType, toast]);
+
   return (
     <div 
       className="h-screen w-screen relative flex flex-col overflow-hidden"
       onMouseMove={() => setShowControls(true)}
       onMouseLeave={() => setTimeout(() => setShowControls(false), 3000)}
     >
-      {/* Background Image */}
       <div 
         className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
         style={{ backgroundImage: `url(${currentImage})`, opacity: 0.9 }}
       ></div>
       <div className="absolute inset-0 bg-black/25"></div>
       
-      {/* Top navigation */}
       <div className="absolute top-0 left-0 right-0 flex justify-between p-4 z-20 text-white/80">
         <div className="flex items-center gap-4">
           <div className="flex flex-col items-start">
@@ -145,17 +144,14 @@ const FocusApp: React.FC = () => {
         </div>
       </div>
       
-      {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-center relative z-10">
         {focusMode === null ? (
           <div className="w-full flex flex-col items-center animate-fade-in">
-            {/* Time and greeting */}
             <div className="text-center mb-16">
               <h1 className="text-9xl font-extralight text-white tracking-wide mb-2">{formatTime()}</h1>
               <p className="text-3xl text-white/90 font-light">{greeting}</p>
             </div>
             
-            {/* Task input */}
             <div className="w-full max-w-xl">
               <TaskInput 
                 value={task} 
@@ -165,14 +161,12 @@ const FocusApp: React.FC = () => {
               />
             </div>
             
-            {/* Quote */}
             <div className="absolute bottom-20 w-full text-center">
               <p className="text-white/80 text-sm italic">
                 "The greatest project you'll ever work on is you."
               </p>
             </div>
             
-            {/* Focus buttons - show only when mouse moves */}
             <div 
               className={`absolute top-20 right-4 transition-opacity duration-300 ${
                 showControls ? 'opacity-100' : 'opacity-0'
@@ -210,7 +204,6 @@ const FocusApp: React.FC = () => {
         )}
       </div>
       
-      {/* Audio controls - fixed at the bottom of the screen */}
       <div 
         className={`fixed bottom-0 left-0 right-0 p-4 transition-opacity duration-300 ${
           showControls ? 'opacity-100' : 'opacity-0'
