@@ -2,19 +2,27 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Volume2, VolumeX } from 'lucide-react';
+import SoundSelector from './SoundSelector';
+import type { SoundOption } from '@/assets/audio';
 
 interface AudioControlProps {
   isPlaying: boolean;
   volume: number;
+  currentSound: SoundOption;
+  sounds: SoundOption[];
   onToggle: () => void;
   onVolumeChange: (volume: number) => void;
+  onSoundChange: (soundId: string) => void;
 }
 
 const AudioControl: React.FC<AudioControlProps> = ({
   isPlaying,
   volume,
+  currentSound,
+  sounds,
   onToggle,
-  onVolumeChange
+  onVolumeChange,
+  onSoundChange
 }) => {
   return (
     <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-lg p-2">
@@ -36,6 +44,12 @@ const AudioControl: React.FC<AudioControlProps> = ({
           className="cursor-pointer"
         />
       </div>
+
+      <SoundSelector
+        currentSound={currentSound}
+        sounds={sounds}
+        onSoundChange={onSoundChange}
+      />
     </div>
   );
 };

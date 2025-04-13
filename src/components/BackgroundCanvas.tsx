@@ -16,7 +16,7 @@ const BackgroundCanvas: React.FC<BackgroundCanvasProps> = ({ onMouseMove, onMous
     Math.floor(Math.random() * NATURE_IMAGES.length)
   );
 
-  const { isPlaying, volume, togglePlayback, adjustVolume } = useBackgroundSound();
+  const { isPlaying, volume, currentSound, sounds, togglePlayback, adjustVolume, changeSound } = useBackgroundSound();
 
   const changeBackground = useCallback(() => {
     setCurrentImageIndex(current => {
@@ -69,8 +69,11 @@ const BackgroundCanvas: React.FC<BackgroundCanvasProps> = ({ onMouseMove, onMous
           <AudioControl
             isPlaying={isPlaying}
             volume={volume}
+            currentSound={currentSound}
+            sounds={sounds}
             onToggle={togglePlayback}
             onVolumeChange={adjustVolume}
+            onSoundChange={changeSound}
           />
         </div>
       </div>
