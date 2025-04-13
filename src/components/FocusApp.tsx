@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import Timer from './Timer';
@@ -23,7 +24,17 @@ const FocusApp: React.FC = () => {
   const [currentImage, setCurrentImage] = useState('');
   const [focusMode, setFocusMode] = useState<FocusMode>(null);
   const [task, setTask] = useState<string>('');
-  const { isPlaying, currentType, volume, audioLoaded, togglePlayback, changeType, adjustVolume } = useAudio();
+  const { 
+    isPlaying, 
+    currentType, 
+    volume, 
+    audioLoaded, 
+    isLoading, 
+    audioError, 
+    togglePlayback, 
+    changeType, 
+    adjustVolume 
+  } = useAudio();
   const { weather, time } = useWeather();
   const [showControls, setShowControls] = useState(false);
   const [greeting, setGreeting] = useState('');
@@ -97,7 +108,16 @@ const FocusApp: React.FC = () => {
     if (savedTask) {
       setTask(savedTask);
     }
-  }, []);
+    
+    // Attempt to play audio after initial load with a small delay
+    const timer = setTimeout(() => {
+      if (audioLoaded && !isPlaying) {
+        togglePlayback();
+      }
+    }, 2000);
+    
+    return () => clearTimeout(timer);
+  }, [audioLoaded, isPlaying, togglePlayback]);
 
   const formatTime = () => {
     if (!time) return '--:--';
@@ -114,6 +134,16 @@ const FocusApp: React.FC = () => {
       });
     }
   }, [audioLoaded, currentType, toast]);
+
+  useEffect(() => {
+    if (audioError) {
+      toast({
+        title: "Audio Issue",
+        description: audioError,
+        variant: "destructive",
+      });
+    }
+  }, [audioError, toast]);
 
   return (
     <div 
@@ -217,6 +247,8 @@ const FocusApp: React.FC = () => {
             onToggle={togglePlayback}
             onTypeChange={changeType}
             onVolumeChange={adjustVolume}
+            isLoading={isLoading}
+            error={audioError}
           />
         </div>
       </div>

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Headphones, Music, Volume2, Loader2 } from 'lucide-react';
+import { Headphones, Music, Volume2, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,8 @@ interface AudioControlsProps {
   onToggle: () => void;
   onTypeChange: (type: string) => void;
   onVolumeChange?: (volume: number) => void;
+  isLoading?: boolean;
+  error?: string | null;
 }
 
 const AUDIO_OPTIONS = [
@@ -28,7 +30,9 @@ const AudioControls: React.FC<AudioControlsProps> = ({
   volume = 0.5,
   onToggle, 
   onTypeChange,
-  onVolumeChange
+  onVolumeChange,
+  isLoading = false,
+  error = null
 }) => {
   const handleVolumeChange = (value: number[]) => {
     if (onVolumeChange) {
@@ -44,9 +48,15 @@ const AudioControls: React.FC<AudioControlsProps> = ({
           variant="outline"
           size="sm"
           onClick={onToggle}
+          disabled={isLoading}
           className={`${isPlaying ? 'bg-white/40' : 'bg-white/20'} hover:bg-white/50 border-white/30 text-white text-xs`}
         >
-          {isPlaying ? (
+          {isLoading ? (
+            <div className="flex items-center gap-1">
+              <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+              <span>Loading</span>
+            </div>
+          ) : isPlaying ? (
             <div className="flex items-center gap-1">
               <Headphones className="w-3 h-3 mr-1" />
               <span>Playing</span>
@@ -59,6 +69,13 @@ const AudioControls: React.FC<AudioControlsProps> = ({
           )}
         </Button>
       </div>
+
+      {error && (
+        <div className="flex items-center gap-1 text-red-400 text-xs px-2 py-1 bg-red-400/10 rounded">
+          <AlertCircle className="w-3 h-3" />
+          <span>{error}</span>
+        </div>
+      )}
 
       <RadioGroup 
         value={selectedType}

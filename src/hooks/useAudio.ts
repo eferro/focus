@@ -1,12 +1,12 @@
 
 import { useState, useEffect, useRef } from 'react';
 
-// Audio sources - using reliable sources from Pixabay (royalty free)
+// Audio sources - using direct MP3 files from more reliable sources
 const audioSources = {
-  rain: "https://cdn.pixabay.com/download/audio/2022/03/10/audio_8cb749dcbc.mp3?filename=rain-and-thunder-16705.mp3", // Rain sound
-  forest: "https://cdn.pixabay.com/download/audio/2021/08/09/audio_b893d2d55d.mp3?filename=forest-with-small-river-birds-and-nature-field-recording-6735.mp3", // Forest ambience
-  white: "https://cdn.pixabay.com/download/audio/2021/08/08/audio_545faf6b2a.mp3?filename=white-noise-6471.mp3", // White noise
-  waves: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d1ed1a45a0.mp3?filename=ocean-waves-112906.mp3", // Ocean waves
+  rain: "https://assets.mixkit.co/active_storage/sfx/212/212-preview.mp3", // Rain sound
+  forest: "https://assets.mixkit.co/active_storage/sfx/2526/2526-preview.mp3", // Forest ambience
+  white: "https://assets.mixkit.co/active_storage/sfx/209/209-preview.mp3", // White noise like sounds
+  waves: "https://assets.mixkit.co/active_storage/sfx/1139/1139-preview.mp3", // Ocean waves
 };
 
 type AudioType = keyof typeof audioSources;
@@ -17,9 +17,12 @@ export function useAudio() {
   const [volume, setVolume] = useState(0.5); // Default volume at 50%
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [audioLoaded, setAudioLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [audioError, setAudioError] = useState<string | null>(null);
 
   // Create audio element when component mounts
   useEffect(() => {
+    console.log("Initializing audio system");
     const audio = new Audio();
     audio.loop = true;
     audio.volume = volume;
@@ -27,24 +30,35 @@ export function useAudio() {
     
     // Set initial source
     audio.src = audioSources[type];
+    setIsLoading(true);
     
     // Handle loading errors
-    audio.addEventListener('error', (e) => {
+    const handleError = (e: Event) => {
       console.error(`Failed to load audio: ${audio.src}`, e);
       setAudioLoaded(false);
-    });
+      setIsLoading(false);
+      setAudioError(`Failed to load ${type} sound`);
+    };
     
     // Handle successful loading
-    audio.addEventListener('canplaythrough', () => {
+    const handleLoaded = () => {
       console.log(`Audio loaded successfully: ${audio.src}`);
       setAudioLoaded(true);
-    });
+      setIsLoading(false);
+      setAudioError(null);
+    };
+    
+    audio.addEventListener('error', handleError);
+    audio.addEventListener('canplaythrough', handleLoaded);
+    
+    // Try to load the audio
+    audio.load();
     
     return () => {
       audio.pause();
       audio.src = '';
-      audio.removeEventListener('error', () => {});
-      audio.removeEventListener('canplaythrough', () => {});
+      audio.removeEventListener('error', handleError);
+      audio.removeEventListener('canplaythrough', handleLoaded);
     };
   }, []);
   
@@ -52,7 +66,11 @@ export function useAudio() {
   useEffect(() => {
     if (audioRef.current) {
       const wasPlaying = !audioRef.current.paused;
+      setIsLoading(true);
       setAudioLoaded(false);
+      setAudioError(null);
+      
+      console.log(`Changing audio source to: ${type}`);
       audioRef.current.src = audioSources[type];
       
       // Preload audio
@@ -74,6 +92,7 @@ export function useAudio() {
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
+      console.log(`Volume adjusted to: ${volume}`);
     }
   }, [volume]);
   
@@ -88,35 +107,52 @@ export function useAudio() {
     } else {
       console.log('Attempting to play audio:', audioRef.current.src);
       
-      const playPromise = audioRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setIsPlaying(true);
-            console.log('Audio playback started successfully');
-          })
-          .catch(err => {
-            console.error('Error playing audio:', err);
-            
-            // Try to play again with user interaction (often resolves autoplay issues)
-            const handleDocumentClick = () => {
-              if (audioRef.current) {
-                audioRef.current.play()
-                  .then(() => {
-                    setIsPlaying(true);
-                    console.log('Audio playback started successfully after user interaction');
-                    document.removeEventListener('click', handleDocumentClick);
-                  })
-                  .catch(innerErr => {
-                    console.error('Error playing audio even after user interaction:', innerErr);
-                  });
-              }
-            };
-            
-            document.addEventListener('click', handleDocumentClick, { once: true });
-            console.log('Added click listener to enable audio after user interaction');
-          });
-      }
+      // Implementation to handle autoplay restrictions
+      const context = new (window.AudioContext || (window as any).webkitAudioContext)();
+      context.resume().then(() => {
+        console.log('AudioContext resumed successfully');
+        
+        if (audioRef.current) {
+          const playPromise = audioRef.current.play();
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                setIsPlaying(true);
+                console.log('Audio playback started successfully');
+              })
+              .catch(err => {
+                console.error('Error playing audio:', err);
+                setAudioError("Playback failed - try clicking again");
+                
+                // Try to play again with user interaction (often resolves autoplay issues)
+                const handleDocumentClick = () => {
+                  if (audioRef.current) {
+                    // Create new audio context on user interaction
+                    const newContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+                    newContext.resume().then(() => {
+                      if (audioRef.current) {
+                        audioRef.current.play()
+                          .then(() => {
+                            setIsPlaying(true);
+                            setAudioError(null);
+                            console.log('Audio playback started after user interaction');
+                            document.removeEventListener('click', handleDocumentClick);
+                          })
+                          .catch(innerErr => {
+                            console.error('Error playing audio even after user interaction:', innerErr);
+                            setAudioError("Browser blocked audio - check settings");
+                          });
+                      }
+                    });
+                  }
+                };
+                
+                document.addEventListener('click', handleDocumentClick, { once: true });
+                console.log('Added click listener to enable audio after user interaction');
+              });
+          }
+        }
+      });
     }
   };
   
@@ -137,6 +173,8 @@ export function useAudio() {
     currentType: type,
     volume,
     audioLoaded,
+    isLoading, 
+    audioError,
     togglePlayback,
     changeType,
     adjustVolume,
