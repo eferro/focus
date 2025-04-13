@@ -1,27 +1,21 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import Timer from './Timer';
-import WeatherDisplay from './WeatherDisplay';
-import TaskInput from './TaskInput';
-import AudioControls from './AudioControls';
 import DisconnectionMode from './DisconnectionMode';
 import { useAudio } from '../hooks/useAudio';
 import { useWeather } from '../hooks/useWeather';
-
-const NATURE_IMAGES = [
-  'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Moraine_Lake_17092005.jpg/1280px-Moraine_Lake_17092005.jpg',
-  'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Clouds_over_the_Atlantic_Ocean.jpg/1280px-Clouds_over_the_Atlantic_Ocean.jpg',
-  'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Biandintz_eta_zaldiak_-_modified2.jpg/1280px-Biandintz_eta_zaldiak_-_modified2.jpg',
-  'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Sunrise_in_Bryce_Canyon.JPG/1280px-Sunrise_in_Bryce_Canyon.JPG',
-  'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Volcanoimage.jpg/1280px-Volcanoimage.jpg',
-];
-
-type FocusMode = 'pomodoro' | 'disconnection' | null;
+import { useGreeting } from '../hooks/useGreeting';
+import { useShowControls } from '../hooks/useShowControls';
+import { useTime } from '../hooks/useTime';
+import { FocusMode } from '../types/focus';
+import BackgroundCanvas from './BackgroundCanvas';
+import Header from './Header';
+import IdleMode from './IdleMode';
+import AudioControlsContainer from './AudioControlsContainer';
 
 const FocusApp: React.FC = () => {
   const { toast } = useToast();
-  const [currentImage, setCurrentImage] = useState('');
   const [focusMode, setFocusMode] = useState<FocusMode>(null);
   const [task, setTask] = useState<string>('');
   const { 
@@ -36,35 +30,9 @@ const FocusApp: React.FC = () => {
     adjustVolume 
   } = useAudio();
   const { weather, time } = useWeather();
-  const [showControls, setShowControls] = useState(false);
-  const [greeting, setGreeting] = useState('');
-
-  useEffect(() => {
-    const randomIndex = Math.floor(Math.random() * NATURE_IMAGES.length);
-    setCurrentImage(NATURE_IMAGES[randomIndex]);
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const randomIndex = Math.floor(Math.random() * NATURE_IMAGES.length);
-      setCurrentImage(NATURE_IMAGES[randomIndex]);
-    }, 5 * 60 * 1000);
-    
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    if (!time) return;
-    
-    const hours = time.getHours();
-    if (hours >= 5 && hours < 12) {
-      setGreeting('Good morning.');
-    } else if (hours >= 12 && hours < 18) {
-      setGreeting('Good afternoon.');
-    } else {
-      setGreeting('Good evening.');
-    }
-  }, [time]);
+  const { showControls, handleMouseMove, handleMouseLeave } = useShowControls();
+  const greeting = useGreeting(time);
+  const formatTime = useTime(time);
 
   const handleStartFocus = useCallback((mode: FocusMode) => {
     if (!task && (mode === 'pomodoro' || mode === 'disconnection')) {
@@ -119,13 +87,6 @@ const FocusApp: React.FC = () => {
     return () => clearTimeout(timer);
   }, [audioLoaded, isPlaying, togglePlayback]);
 
-  const formatTime = () => {
-    if (!time) return '--:--';
-    const hours = time.getHours().toString().padStart(2, '0');
-    const minutes = time.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
-  };
-
   useEffect(() => {
     if (audioLoaded) {
       toast({
@@ -146,78 +107,20 @@ const FocusApp: React.FC = () => {
   }, [audioError, toast]);
 
   return (
-    <div 
-      className="h-screen w-screen relative flex flex-col overflow-hidden"
-      onMouseMove={() => setShowControls(true)}
-      onMouseLeave={() => setTimeout(() => setShowControls(false), 3000)}
-    >
-      <div 
-        className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
-        style={{ backgroundImage: `url(${currentImage})`, opacity: 0.9 }}
-      ></div>
-      <div className="absolute inset-0 bg-black/25"></div>
-      
-      <div className="absolute top-0 left-0 right-0 flex justify-between p-4 z-20 text-white/80">
-        <div className="flex items-center gap-4">
-          <div className="flex flex-col items-start">
-            <span className="text-sm">Links</span>
-            <span className="text-xs font-light">Focus</span>
-          </div>
-        </div>
-        <div className="flex items-center gap-4">
-          {weather && (
-            <div className="flex items-center">
-              <span className="text-sm">{Math.round(weather.temp)}°</span>
-              <span className="text-xs ml-1">{weather.city}</span>
-            </div>
-          )}
-        </div>
-      </div>
+    <BackgroundCanvas onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
+      <Header time={time} weather={weather} />
       
       <div className="flex-1 flex flex-col items-center justify-center relative z-10">
         {focusMode === null ? (
-          <div className="w-full flex flex-col items-center animate-fade-in">
-            <div className="text-center mb-16">
-              <h1 className="text-9xl font-extralight text-white tracking-wide mb-2">{formatTime()}</h1>
-              <p className="text-3xl text-white/90 font-light">{greeting}</p>
-            </div>
-            
-            <div className="w-full max-w-xl">
-              <TaskInput 
-                value={task} 
-                onChange={handleTaskChange} 
-                placeholder="What is your main goal for today?"
-                className="text-xl text-center"
-              />
-            </div>
-            
-            <div className="absolute bottom-20 w-full text-center">
-              <p className="text-white/80 text-sm italic">
-                "The greatest project you'll ever work on is you."
-              </p>
-            </div>
-            
-            <div 
-              className={`absolute top-20 right-4 transition-opacity duration-300 ${
-                showControls ? 'opacity-100' : 'opacity-0'
-              }`}
-            >
-              <div className="flex flex-col space-y-2">
-                <button
-                  onClick={() => handleStartFocus('pomodoro')}
-                  className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg text-sm"
-                >
-                  Pomodoro Focus
-                </button>
-                <button
-                  onClick={() => handleStartFocus('disconnection')}
-                  className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg text-sm"
-                >
-                  Disconnection Mode
-                </button>
-              </div>
-            </div>
-          </div>
+          <IdleMode
+            time={time}
+            greeting={greeting}
+            task={task}
+            onTaskChange={handleTaskChange}
+            onStartFocus={handleStartFocus}
+            showControls={showControls}
+            formatTime={formatTime}
+          />
         ) : focusMode === 'pomodoro' ? (
           <Timer 
             type="pomodoro"
@@ -234,25 +137,18 @@ const FocusApp: React.FC = () => {
         )}
       </div>
       
-      <div 
-        className={`fixed bottom-0 left-0 right-0 p-4 transition-opacity duration-300 ${
-          showControls ? 'opacity-100' : 'opacity-0'
-        }`}
-      >
-        <div className="max-w-xs mx-auto">
-          <AudioControls 
-            isPlaying={isPlaying}
-            selectedType={currentType}
-            volume={volume}
-            onToggle={togglePlayback}
-            onTypeChange={changeType}
-            onVolumeChange={adjustVolume}
-            isLoading={isLoading}
-            error={audioError}
-          />
-        </div>
-      </div>
-    </div>
+      <AudioControlsContainer
+        showControls={showControls}
+        isPlaying={isPlaying}
+        currentType={currentType}
+        volume={volume}
+        togglePlayback={togglePlayback}
+        changeType={changeType}
+        adjustVolume={adjustVolume}
+        isLoading={isLoading}
+        audioError={audioError}
+      />
+    </BackgroundCanvas>
   );
 };
 
