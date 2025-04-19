@@ -6,6 +6,7 @@ export function useBackgroundSound() {
   const [volume, setVolume] = useState(0.3); // Default volume at 30%
   const [currentSoundId, setCurrentSoundId] = useState(SOUND_OPTIONS[0].id);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const playPromiseRef = useRef<Promise<void> | null>(null);
 
   const currentSound = SOUND_OPTIONS.find(sound => sound.id === currentSoundId)!;
 
@@ -18,7 +19,11 @@ export function useBackgroundSound() {
 
     // If it was playing before changing sound, start playing the new sound
     if (isPlaying) {
-      audio.play().catch(console.error);
+      playPromiseRef.current = audio.play().catch(error => {
+        if (error.name !== 'AbortError') {
+          console.error('Error playing audio:', error);
+        }
+      });
     }
 
     // Cleanup on unmount or sound change
@@ -37,26 +42,32 @@ export function useBackgroundSound() {
     }
   }, [volume]);
 
-  const togglePlayback = () => {
+  const togglePlayback = async () => {
     if (!audioRef.current) return;
 
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      // Create a new AudioContext to handle autoplay restrictions
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      audioContext.resume().then(() => {
-        if (audioRef.current) {
-          audioRef.current.play()
-            .then(() => {
-              setIsPlaying(true);
-            })
-            .catch(err => {
-              console.error('Error playing audio:', err);
-            });
+    try {
+      if (isPlaying) {
+        // If there's a pending play operation, wait for it
+        if (playPromiseRef.current) {
+          await playPromiseRef.current;
         }
-      });
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        // Create a new AudioContext to handle autoplay restrictions
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        await audioContext.resume();
+        
+        if (audioRef.current) {
+          playPromiseRef.current = audioRef.current.play();
+          await playPromiseRef.current;
+          setIsPlaying(true);
+        }
+      }
+    } catch (error) {
+      if (error instanceof Error && error.name !== 'AbortError') {
+        console.error('Error toggling audio:', error);
+      }
     }
   };
 
