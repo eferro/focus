@@ -1,9 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { NATURE_IMAGES } from '../assets/images/backgrounds';
 import { Button } from "@/components/ui/button";
 import { Shuffle } from 'lucide-react';
 import { useBackgroundSound } from '../hooks/useBackgroundSound';
 import AudioControl from './AudioControl';
+
+const TOTAL_PHOTOS = 38;
+
+const getPhotoPath = (index: number) => {
+  const paddedNumber = String(index).padStart(4, '0');
+  return `/focus/photos/photo_${paddedNumber}.webp`;
+};
 
 interface BackgroundCanvasProps {
   onMouseMove: () => void;
@@ -12,18 +18,18 @@ interface BackgroundCanvasProps {
 }
 
 const BackgroundCanvas: React.FC<BackgroundCanvasProps> = ({ onMouseMove, onMouseLeave, children }) => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(() => 
-    Math.floor(Math.random() * NATURE_IMAGES.length)
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(() => 
+    Math.floor(Math.random() * TOTAL_PHOTOS) + 1
   );
 
   const { isPlaying, volume, currentSound, sounds, togglePlayback, adjustVolume, changeSound } = useBackgroundSound();
 
   const changeBackground = useCallback(() => {
-    setCurrentImageIndex(current => {
-      let newIndex = Math.floor(Math.random() * NATURE_IMAGES.length);
+    setCurrentPhotoIndex(current => {
+      let newIndex = Math.floor(Math.random() * TOTAL_PHOTOS) + 1;
       // Make sure we don't get the same image twice
-      if (newIndex === current && NATURE_IMAGES.length > 1) {
-        newIndex = (newIndex + 1) % NATURE_IMAGES.length;
+      if (newIndex === current && TOTAL_PHOTOS > 1) {
+        newIndex = (newIndex % TOTAL_PHOTOS) + 1;
       }
       return newIndex;
     });
@@ -34,7 +40,7 @@ const BackgroundCanvas: React.FC<BackgroundCanvasProps> = ({ onMouseMove, onMous
     return () => clearInterval(interval);
   }, [changeBackground]);
 
-  const currentImage = NATURE_IMAGES[currentImageIndex];
+  const currentPhotoPath = getPhotoPath(currentPhotoIndex);
 
   return (
     <div 
@@ -47,7 +53,7 @@ const BackgroundCanvas: React.FC<BackgroundCanvasProps> = ({ onMouseMove, onMous
         <div 
           className="absolute inset-0 bg-cover bg-center transition-all duration-1000"
           style={{ 
-            backgroundImage: `url(${currentImage})`, 
+            backgroundImage: `url(${currentPhotoPath})`, 
             opacity: 0.9 
           }}
         />
