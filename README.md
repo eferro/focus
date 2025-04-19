@@ -1,87 +1,87 @@
-# Welcome to your Lovable project
+# Focus Timer 🎯
 
-## Project info
+A minimalist yet powerful focus timer app built with React and TypeScript. Designed to help you maintain productivity with style and simplicity.
 
-**URL**: https://lovable.dev/projects/1f8dee5b-2a48-42db-89a6-f157263c8f21
+## ✨ Features
 
-## How can I edit this code?
+- 🕒 Customizable Pomodoro timer (25 minutes default)
+- ☕ Break timer options:
+  - Short break (5 minutes)
+  - Long break (15 minutes)
+- 🎵 Ambient nature sounds for enhanced focus
+- 🖼️ Beautiful background images that change automatically
+- 🌗 Clean and modern UI with visual feedback
+- 📱 Fully responsive design for all devices
+- 🔔 Toast notifications for timer events
+- ⌨️ Keyboard shortcuts for quick control
 
-There are several ways of editing your application.
+## 🛠️ Technologies
 
-**Use Lovable**
+- **Frontend Framework**: React 18 with TypeScript
+- **Build Tool**: Vite
+- **UI Components**: 
+  - shadcn/ui (Radix UI)
+  - Lucide React Icons
+- **Styling**: 
+  - Tailwind CSS
+  - CSS Animations
+- **State Management**: React Hooks
+- **Development**:
+  - TypeScript
+  - ESLint
+  - PostCSS
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/1f8dee5b-2a48-42db-89a6-f157263c8f21) and start prompting.
+## 🚀 Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+- Node.js (LTS version recommended)
+- npm (comes with Node.js)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+### Installation
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Clone the repository
+git clone https://github.com/yourusername/focus.git
+cd focus
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Install dependencies
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The app will be available at `http://localhost:8080/focus/`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
+## 📦 Deployment
 
 ### GitHub Pages Deployment
 
-1. Go to your repository settings on GitHub
-2. Navigate to "Pages" under "Code and automation"
-3. Under "Build and deployment":
-   - Source: Select "GitHub Actions"
-   - Branch: Select "gh-pages" (this will be created automatically)
-4. The site will be available at: `https://<your-username>.github.io/serene-focus-scape/`
+The project is configured for automatic deployment to GitHub Pages:
 
-The deployment is automated through GitHub Actions. Every push to the main branch will trigger a new deployment.
+1. Ensure your repository is public
+2. Configure GitHub Pages in your repository settings:
+   - Go to Settings > Pages
+   - Source: Deploy from a branch
+   - Branch: gh-pages
+3. The deployment will be triggered automatically on push to main
+4. Access your app at: `https://<your-username>.github.io/focus/`
 
-### Lovable Deployment
+### Manual Deployment
 
-Alternatively, you can deploy through Lovable:
-Simply open [Lovable](https://lovable.dev/projects/1f8dee5b-2a48-42db-89a6-f157263c8f21) and click on Share -> Publish.
+```sh
+# Build the project
+npm run build
 
-## Can I connect a custom domain to my Lovable project?
+# Deploy to GitHub Pages
+npm run deploy
+```
 
-Yes it is!
+## 🤝 Contributing
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Contributions are welcome! Feel free to open issues and submit pull requests.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 📝 License
+
+This project is open source and available under the MIT License.

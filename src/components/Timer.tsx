@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { CirclePlay, CircleStop, Coffee, Timer as TimerIcon } from 'lucide-react';
+import { PlayCircle, StopCircle, Coffee, Timer as TimerIcon } from 'lucide-react';
 
 interface TimerProps {
   type: 'pomodoro' | 'break';
@@ -118,7 +118,7 @@ const Timer: React.FC<TimerProps> = ({
               onClick={toggleTimer}
               className="bg-white/20 hover:bg-white/30 text-white border-white/30 h-9 w-9"
             >
-              {isActive ? <CircleStop className="h-5 w-5" /> : <CirclePlay className="h-5 w-5" />}
+              {isActive ? <StopCircle className="h-5 w-5" /> : <PlayCircle className="h-5 w-5" />}
             </Button>
             
             <Button
