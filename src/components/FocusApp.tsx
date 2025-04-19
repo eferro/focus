@@ -15,6 +15,7 @@ const FocusApp: React.FC = () => {
   const { toast } = useToast();
   const [focusMode, setFocusMode] = useState<FocusMode>(null);
   const [task, setTask] = useState<string>('');
+  const [breakDuration, setBreakDuration] = useState<number | null>(null);
   const { weather, time } = useWeather();
   const { showControls, handleMouseMove, handleMouseLeave } = useShowControls();
   const greeting = useGreeting(time);
@@ -22,6 +23,7 @@ const FocusApp: React.FC = () => {
 
   const handleStartFocus = useCallback((mode: FocusMode) => {
     setFocusMode(mode);
+    setBreakDuration(null);
     if (mode === 'pomodoro') {
       toast({
         title: "Pomodoro Started",
@@ -35,13 +37,29 @@ const FocusApp: React.FC = () => {
     }
   }, [toast]);
 
-  const handleFocusComplete = useCallback(() => {
+  const handleStartBreak = useCallback((duration: number) => {
+    setBreakDuration(duration);
     toast({
-      title: "Good Job!",
-      description: "Focus session completed. Take a well-deserved break.",
+      title: "Break Time",
+      description: `Taking a ${duration / 60} minute break. Relax and recharge!`,
     });
-    setFocusMode(null);
   }, [toast]);
+
+  const handleFocusComplete = useCallback(() => {
+    if (breakDuration) {
+      toast({
+        title: "Break Complete",
+        description: "Break time is over. Ready to focus again?",
+      });
+    } else {
+      toast({
+        title: "Good Job!",
+        description: "Focus session completed. Take a well-deserved break.",
+      });
+    }
+    setFocusMode(null);
+    setBreakDuration(null);
+  }, [toast, breakDuration]);
 
   const handleTaskChange = useCallback((newTask: string) => {
     setTask(newTask);
@@ -72,10 +90,15 @@ const FocusApp: React.FC = () => {
           />
         ) : focusMode === 'pomodoro' ? (
           <Timer 
-            type="pomodoro"
+            type={breakDuration ? 'break' : 'pomodoro'}
             task={task} 
             onComplete={handleFocusComplete}
-            onCancel={() => setFocusMode(null)}
+            onCancel={() => {
+              setFocusMode(null);
+              setBreakDuration(null);
+            }}
+            onBreak={!breakDuration ? handleStartBreak : undefined}
+            breakDuration={breakDuration || undefined}
           />
         ) : (
           <DisconnectionMode
