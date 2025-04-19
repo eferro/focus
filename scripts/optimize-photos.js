@@ -7,7 +7,7 @@ import { PHOTO_ROTATIONS } from './photo-rotations.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PHOTOS_DIR = path.join(process.cwd(), 'src/assets/images/photos');
+const PHOTOS_DIR = path.join(process.cwd(), '@photos');
 const OPTIMIZED_DIR = path.join(process.cwd(), 'public/photos');
 
 async function optimizePhoto(filename) {
