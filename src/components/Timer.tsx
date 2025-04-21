@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { PlayCircle, StopCircle, Coffee, Timer as TimerIcon } from 'lucide-react';
+import { Timer as TimerIcon } from 'lucide-react';
 
 interface TimerProps {
   type: 'pomodoro' | 'break';
@@ -33,7 +33,6 @@ const Timer: React.FC<TimerProps> = ({
     return POMODORO_TIME;
   });
 
-  const [isActive, setIsActive] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentDuration, setCurrentDuration] = useState(() => {
     if (type === 'break' && breakDuration) {
@@ -44,34 +43,22 @@ const Timer: React.FC<TimerProps> = ({
 
   // Update page title with timer
   useEffect(() => {
-    if (!isActive) {
-      document.title = 'Focus Timer';
-      return;
-    }
-
-    const updateTitle = () => {
-      const mins = Math.floor(timeLeft / 60);
-      const secs = timeLeft % 60;
-      const timeStr = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-      const isBreak = type === 'break' || breakDuration !== undefined;
-      const mode = isBreak ? 'Break' : 'Focus';
-      document.title = `${timeStr} - ${mode} | Focus Timer`;
-    };
-
-    updateTitle();
-    const interval = setInterval(updateTitle, 1000);
+    const mins = Math.floor(timeLeft / 60);
+    const secs = timeLeft % 60;
+    const timeStr = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    const isBreak = type === 'break' || breakDuration !== undefined;
+    const mode = isBreak ? 'Break' : 'Focus';
+    document.title = `${timeStr} - ${mode}`;
 
     return () => {
-      clearInterval(interval);
       document.title = 'Focus Timer';
     };
-  }, [timeLeft, isActive, type, breakDuration]);
+  }, [timeLeft, type, breakDuration]);
 
   const resetTimer = useCallback((duration: number) => {
     setTimeLeft(duration);
     setCurrentDuration(duration);
     setProgress(100);
-    setIsActive(true);
   }, []);
 
   // Reset timer when type or breakDuration changes
@@ -93,14 +80,10 @@ const Timer: React.FC<TimerProps> = ({
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   }, []);
 
-  const toggleTimer = useCallback(() => {
-    setIsActive(prev => !prev);
-  }, []);
-
   useEffect(() => {
     let timer: NodeJS.Timeout;
     
-    if (isActive && timeLeft > 0) {
+    if (timeLeft > 0) {
       timer = setInterval(() => {
         setTimeLeft(prevTime => {
           const newTime = prevTime - 1;
@@ -114,7 +97,7 @@ const Timer: React.FC<TimerProps> = ({
     }
     
     return () => clearInterval(timer);
-  }, [isActive, timeLeft, currentDuration, onComplete]);
+  }, [timeLeft, currentDuration, onComplete]);
 
   return (
     <div className="glass rounded-2xl w-[380px] animate-fade-in">
@@ -139,15 +122,6 @@ const Timer: React.FC<TimerProps> = ({
         <div className="flex flex-col gap-3 pb-8">
           {/* Main controls */}
           <div className="flex items-center justify-center gap-3">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={toggleTimer}
-              className="bg-white/20 hover:bg-white/30 text-white border-white/30 h-9 w-9"
-            >
-              {isActive ? <StopCircle className="h-5 w-5" /> : <PlayCircle className="h-5 w-5" />}
-            </Button>
-            
             <Button
               variant="outline"
               onClick={onCancel}
@@ -196,32 +170,6 @@ const Timer: React.FC<TimerProps> = ({
               25m
             </Button>
           </div>
-        </div>
-      </div>
-
-      {/* Debug Information */}
-      <div className="mt-4 p-2 bg-black/20 rounded-lg text-xs font-mono text-white/80">
-        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-          <div>Mode:</div>
-          <div>{type === 'break' || breakDuration !== undefined ? 'Break' : 'Focus'}</div>
-          
-          <div>Time Left:</div>
-          <div>{formatTime(timeLeft)}</div>
-          
-          <div>End Time:</div>
-          <div>{new Date(Date.now() + timeLeft * 1000).toLocaleTimeString()}</div>
-          
-          <div>Title:</div>
-          <div>{document.title}</div>
-          
-          <div>Active:</div>
-          <div>{isActive ? 'Yes' : 'No'}</div>
-          
-          <div>Break Duration:</div>
-          <div>{breakDuration ? formatTime(breakDuration) : 'None'}</div>
-          
-          <div>Progress:</div>
-          <div>{progress.toFixed(1)}%</div>
         </div>
       </div>
     </div>
