@@ -52,10 +52,10 @@ const FocusApp: React.FC = () => {
         description: "Break time is over. Ready to focus again?",
       });
     } else {
-      toast({
-        title: "Good Job!",
-        description: "Focus session completed. Take a well-deserved break.",
-      });
+    toast({
+      title: "Good Job!",
+      description: "Focus session completed. Take a well-deserved break.",
+    });
     }
     setFocusMode(null);
     setBreakDuration(null);
@@ -65,6 +65,15 @@ const FocusApp: React.FC = () => {
     setTask(newTask);
     localStorage.setItem('focusTask', newTask);
   }, []);
+
+  const handleRestartPomodoro = useCallback(() => {
+    setBreakDuration(null);
+    setFocusMode('pomodoro');
+    toast({
+      title: "Pomodoro Started",
+      description: "25 minutes of focus time. You can do it!",
+    });
+  }, [toast]);
 
   useEffect(() => {
     const savedTask = localStorage.getItem('focusTask');
@@ -97,7 +106,8 @@ const FocusApp: React.FC = () => {
               setFocusMode(null);
               setBreakDuration(null);
             }}
-            onBreak={!breakDuration ? handleStartBreak : undefined}
+            onBreak={handleStartBreak}
+            onStartFocus={handleRestartPomodoro}
             breakDuration={breakDuration || undefined}
           />
         ) : (

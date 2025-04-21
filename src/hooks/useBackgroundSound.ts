@@ -46,28 +46,28 @@ export function useBackgroundSound() {
     if (!audioRef.current) return;
 
     try {
-      if (isPlaying) {
+    if (isPlaying) {
         // If there's a pending play operation, wait for it
         if (playPromiseRef.current) {
           await playPromiseRef.current;
         }
-        audioRef.current.pause();
-        setIsPlaying(false);
-      } else {
-        // Create a new AudioContext to handle autoplay restrictions
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      // Create a new AudioContext to handle autoplay restrictions
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
         await audioContext.resume();
         
         if (audioRef.current) {
           playPromiseRef.current = audioRef.current.play();
           await playPromiseRef.current;
-          setIsPlaying(true);
+              setIsPlaying(true);
         }
       }
     } catch (error) {
       if (error instanceof Error && error.name !== 'AbortError') {
         console.error('Error toggling audio:', error);
-      }
+        }
     }
   };
 
