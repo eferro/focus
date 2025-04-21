@@ -41,8 +41,15 @@ const Timer: React.FC<TimerProps> = ({
     return POMODORO_TIME;
   });
 
+  const [isActive, setIsActive] = useState(true);
+
   // Update page title with timer
   useEffect(() => {
+    if (!isActive) {
+      document.title = 'Focus Timer';
+      return;
+    }
+
     const mins = Math.floor(timeLeft / 60);
     const secs = timeLeft % 60;
     const timeStr = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
@@ -53,7 +60,7 @@ const Timer: React.FC<TimerProps> = ({
     return () => {
       document.title = 'Focus Timer';
     };
-  }, [timeLeft, type, breakDuration]);
+  }, [timeLeft, type, breakDuration, isActive]);
 
   const resetTimer = useCallback((duration: number) => {
     setTimeLeft(duration);
@@ -124,7 +131,10 @@ const Timer: React.FC<TimerProps> = ({
           <div className="flex items-center justify-center gap-3">
             <Button
               variant="outline"
-              onClick={onCancel}
+              onClick={() => {
+                setIsActive(false);
+                onCancel();
+              }}
               className="bg-white/20 hover:bg-white/30 text-white border-white/30 h-9 px-4"
             >
               Cancel
@@ -139,6 +149,7 @@ const Timer: React.FC<TimerProps> = ({
               onClick={() => {
                 onBreak(SHORT_BREAK);
                 resetTimer(SHORT_BREAK);
+                setIsActive(true);
               }}
               className="bg-white/10 hover:bg-white/20 text-white border-white/20 h-7 px-2 text-xs"
             >
@@ -151,6 +162,7 @@ const Timer: React.FC<TimerProps> = ({
               onClick={() => {
                 onBreak(LONG_BREAK);
                 resetTimer(LONG_BREAK);
+                setIsActive(true);
               }}
               className="bg-white/10 hover:bg-white/20 text-white border-white/20 h-7 px-2 text-xs"
             >
@@ -163,6 +175,7 @@ const Timer: React.FC<TimerProps> = ({
               onClick={() => {
                 onStartFocus('pomodoro');
                 resetTimer(POMODORO_TIME);
+                setIsActive(true);
               }}
               className="bg-white/10 hover:bg-white/20 text-white border-white/20 h-7 px-2 text-xs"
             >
