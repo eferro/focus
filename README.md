@@ -1,19 +1,38 @@
 # Focus Timer 🎯
 
-A minimalist yet powerful focus timer app built with React and TypeScript. Designed to help you maintain productivity with style and simplicity.
+A minimalist yet powerful focus timer app built with React and TypeScript. Designed to help you maintain productivity with style and simplicity. The app features a distraction-free interface that helps you stay focused on your tasks.
 
 ## ✨ Features
 
-- 🕒 Customizable Pomodoro timer (25 minutes default)
-- ☕ Break timer options:
-  - Short break (5 minutes)
+- 🕒 Pomodoro Timer:
+  - Focus sessions (25 minutes)
+  - Automatic timer start on mode selection
+  - Visual progress indicator
+  - Browser tab title updates with current timer
+- ☕ Break Timer Options:
+  - Quick break (5 minutes)
   - Long break (15 minutes)
-- 🎵 Ambient nature sounds for enhanced focus
-- 🖼️ Beautiful background images that change automatically
-- 🌗 Clean and modern UI with visual feedback
-- 📱 Fully responsive design for all devices
-- 🔔 Toast notifications for timer events
-- ⌨️ Keyboard shortcuts for quick control
+  - Seamless switching between focus and break modes
+- 🎯 Focus Modes:
+  - Standard Pomodoro mode
+  - Disconnection mode (resets on movement)
+- 🖼️ Dynamic Interface:
+  - Beautiful background images that change automatically
+  - Smooth transitions between modes
+  - Clean and modern glass-morphism design
+- 📱 Responsive Features:
+  - Works on all devices
+  - Adapts to screen size
+  - Touch-friendly controls
+- 🔔 Smart Notifications:
+  - Mode change notifications
+  - Break start/end alerts
+  - Session completion messages
+- 💡 User Experience:
+  - One-click mode switching
+  - Persistent task saving
+  - Distraction-free interface
+  - No pause option to maintain focus
 
 ## 🛠️ Technologies
 
@@ -25,6 +44,7 @@ A minimalist yet powerful focus timer app built with React and TypeScript. Desig
 - **Styling**: 
   - Tailwind CSS
   - CSS Animations
+  - Glass-morphism effects
 - **State Management**: React Hooks
 - **Development**:
   - TypeScript
