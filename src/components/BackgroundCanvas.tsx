@@ -88,6 +88,20 @@ const BackgroundCanvas: React.FC<BackgroundCanvasProps> = ({ onMouseMove, onMous
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center">
         {children}
       </div>
+
+      {/* Footer */}
+      <div className="absolute bottom-4 left-0 right-0 z-50 text-center">
+        <p className="text-white/80 text-sm">
+          <a 
+            href="https://www.eferro.net" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="hover:text-white transition-colors"
+          >
+            Made with ❤️ by eferro
+          </a>
+        </p>
+      </div>
     </div>
   );
 };
