@@ -64,7 +64,7 @@ const IdleMode: React.FC<IdleModeProps> = ({
       {/* Bottom Section - Quote */}
       <div className="text-center px-4">
         <p className="text-white/80 text-sm sm:text-base italic">
-          "The greatest project you'll ever work on is you."
+          "Building focus, building you."
         </p>
       </div>
     </div>
