@@ -98,4 +98,35 @@ describe('Timer', () => {
     });
     expect(defaultProps.onCancel).toHaveBeenCalled();
   });
+
+  it('handles short break button: calls onBreak and resets time to 05:00', () => {
+    render(<Timer {...defaultProps} />);
+    // Target the exact 5m button to avoid matching 15m or 25m
+    const btn5 = screen.getByText(/^5m$/);
+    act(() => {
+      fireEvent.click(btn5);
+    });
+    expect(defaultProps.onBreak).toHaveBeenCalledWith(5 * 60);
+    expect(screen.getByText('05:00')).toBeInTheDocument();
+  });
+
+  it('handles long break button: calls onBreak and resets time to 15:00', () => {
+    render(<Timer {...defaultProps} />);
+    const btn15 = screen.getByText(/^15m$/);
+    act(() => {
+      fireEvent.click(btn15);
+    });
+    expect(defaultProps.onBreak).toHaveBeenCalledWith(15 * 60);
+    expect(screen.getByText('15:00')).toBeInTheDocument();
+  });
+
+  it('handles restart button: calls onStartFocus and resets time to 25:00', () => {
+    render(<Timer {...defaultProps} />);
+    const btn25 = screen.getByText(/^25m$/);
+    act(() => {
+      fireEvent.click(btn25);
+    });
+    expect(defaultProps.onStartFocus).toHaveBeenCalledWith('pomodoro');
+    expect(screen.getByText('25:00')).toBeInTheDocument();
+  });
 }); 
