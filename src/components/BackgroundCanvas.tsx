@@ -44,6 +44,7 @@ const BackgroundCanvas: React.FC<BackgroundCanvasProps> = ({ onMouseMove, onMous
 
   return (
     <div 
+      data-testid="background-canvas"
       className="h-screen w-screen relative flex flex-col overflow-hidden"
       onMouseMove={onMouseMove}
       onMouseLeave={onMouseLeave}
