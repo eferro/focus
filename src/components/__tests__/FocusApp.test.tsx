@@ -38,4 +38,18 @@ describe('FocusApp integration', () => {
     await user.click(cancelBtn);
     expect(screen.getByText('Pomodoro Focus')).toBeInTheDocument();
   });
+  it('loads saved task from localStorage and updates it on change', async () => {
+    // Pre-populate localStorage
+    localStorage.setItem('focusTask', 'Saved Task');
+    const toastMock = vi.fn();
+    (useToast as vi.Mock).mockReturnValue({ toast: toastMock });
+    const user = userEvent.setup({ delay: 0 });
+    render(<FocusApp />);
+    // TaskInput should display saved task
+    const input = screen.getByPlaceholderText(/main goal for today/i) as HTMLInputElement;
+    expect(input.value).toBe('Saved Task');
+    // Type additional text
+    await user.type(input, ' A');
+    expect(localStorage.getItem('focusTask')).toBe('Saved Task A');
+  });
 });
