@@ -26,6 +26,7 @@ const SoundSelector: React.FC<SoundSelectorProps> = ({
         <Button
           variant="ghost"
           size="icon"
+          aria-label="Change sound"
           className="text-white hover:bg-white/20 relative"
         >
           <Music className="h-4 w-4" />

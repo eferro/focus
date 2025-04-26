@@ -30,6 +30,7 @@ const AudioControl: React.FC<AudioControlProps> = ({
         variant="ghost"
         size="icon"
         onClick={onToggle}
+        aria-label={isPlaying ? 'Mute audio' : 'Unmute audio'}
         className="text-white hover:bg-white/20"
       >
         {isPlaying ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
