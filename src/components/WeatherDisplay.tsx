@@ -26,9 +26,9 @@ const WeatherDisplay: React.FC = () => {
       ) : weather ? (
         <div className="flex items-center space-x-2">
           {weather.temp < 20 ? (
-            <Cloud className="h-4 w-4" />
+            <Cloud data-testid={Cloud.displayName} className="h-4 w-4" />
           ) : (
-            <Sun className="h-4 w-4" />
+            <Sun data-testid={Sun.displayName} className="h-4 w-4" />
           )}
           <span className="text-sm">{Math.round(weather.temp)}°C</span>
           <span className="text-xs opacity-70">{weather.description}</span>
