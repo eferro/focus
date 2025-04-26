@@ -16,7 +16,8 @@ const customRender = (
   options?: Omit<RenderOptions, 'wrapper'>,
 ) => {
   return {
-    user: userEvent.setup(),
+    // Configure userEvent with no delay to avoid async act warnings
+    user: userEvent.setup({ delay: 0 }),
     ...render(ui, { wrapper: AllTheProviders, ...options }),
   };
 };
