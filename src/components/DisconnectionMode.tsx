@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 
@@ -26,14 +26,19 @@ const DisconnectionMode: React.FC<DisconnectionModeProps> = ({
   }, []);
 
   // Reset timer on movement
+  const movementTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const handleMovement = useCallback(() => {
     setTimeLeft(DISCONNECTION_TIME);
     setProgress(100);
     setHasMovement(true);
-    
+    // Clear any existing reset timeout
+    if (movementTimeoutRef.current) {
+      clearTimeout(movementTimeoutRef.current);
+    }
     // Clear movement state after a short delay
-    setTimeout(() => {
+    movementTimeoutRef.current = setTimeout(() => {
       setHasMovement(false);
+      movementTimeoutRef.current = null;
     }, 1000);
   }, [DISCONNECTION_TIME]);
 
@@ -48,6 +53,11 @@ const DisconnectionMode: React.FC<DisconnectionModeProps> = ({
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('keydown', handleKeyDown);
+      // Clear pending movement timeout on unmount
+      if (movementTimeoutRef.current) {
+        clearTimeout(movementTimeoutRef.current);
+        movementTimeoutRef.current = null;
+      }
     };
   }, [handleMovement]);
 

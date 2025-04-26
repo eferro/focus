@@ -15,7 +15,8 @@ describe('DisconnectionMode', () => {
   });
 
   afterEach(() => {
-    vi.runOnlyPendingTimers();
+    // Clear any pending timers without invoking callbacks to avoid act warnings
+    vi.clearAllTimers();
     vi.useRealTimers();
   });
 
@@ -52,10 +53,10 @@ describe('DisconnectionMode', () => {
     expect(screen.getByText(/01:5[6-8]/)).toBeInTheDocument();
     // Simulate movement
     act(() => {
+      // Trigger movement; timer state resets immediately
       window.dispatchEvent(new Event('mousemove'));
-      vi.advanceTimersByTime(0);
     });
-    // Timer should reset to 02:00
+    // After reset, timer should go back to full 02:00
     expect(screen.getByText(/02:00/)).toBeInTheDocument();
   });
 });
