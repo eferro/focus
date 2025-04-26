@@ -68,6 +68,7 @@ const BackgroundCanvas: React.FC<BackgroundCanvasProps> = ({ onMouseMove, onMous
             variant="outline"
             size="icon"
             onClick={changeBackground}
+            aria-label="Shuffle background"
             className="bg-white/20 hover:bg-white/30 text-white border-white/30 cursor-pointer"
           >
             <Shuffle className="h-4 w-4" />
