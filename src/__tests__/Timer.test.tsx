@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Timer from '../components/Timer';
 
@@ -90,14 +90,12 @@ describe('Timer', () => {
   });
 
   it('calls onCancel when cancel button is clicked', async () => {
-    vi.useRealTimers();
-    const user = userEvent.setup();
+    // Clicking cancel button should invoke onCancel immediately
     render(<Timer {...defaultProps} />);
-    
     const cancelButton = screen.getByRole('button', { name: 'Cancel' });
-    await user.click(cancelButton);
-    
+    act(() => {
+      fireEvent.click(cancelButton);
+    });
     expect(defaultProps.onCancel).toHaveBeenCalled();
-    vi.useFakeTimers(); // Restore fake timers for subsequent tests
   });
 }); 

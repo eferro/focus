@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 
@@ -22,7 +22,9 @@ describe('FocusApp integration', () => {
     (useToast as vi.Mock).mockReturnValue({ toast: toastMock });
     const user = userEvent.setup({ delay: 0 });
 
-    render(<FocusApp />);
+    act(() => {
+      render(<FocusApp />);
+    });
     // IdleMode should show Pomodoro button
     const pomodoroBtn = screen.getByText('Pomodoro Focus');
     await user.click(pomodoroBtn);
@@ -44,7 +46,9 @@ describe('FocusApp integration', () => {
     const toastMock = vi.fn();
     (useToast as vi.Mock).mockReturnValue({ toast: toastMock });
     const user = userEvent.setup({ delay: 0 });
-    render(<FocusApp />);
+    act(() => {
+      render(<FocusApp />);
+    });
     // TaskInput should display saved task
     const input = screen.getByPlaceholderText(/main goal for today/i) as HTMLInputElement;
     expect(input.value).toBe('Saved Task');

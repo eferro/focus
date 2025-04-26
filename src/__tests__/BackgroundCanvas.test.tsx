@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, act, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import BackgroundCanvas from '../components/BackgroundCanvas';
 
@@ -38,12 +38,9 @@ describe('BackgroundCanvas', () => {
   });
 
   it('calls onMouseMove when mouse moves', async () => {
-    const user = userEvent.setup();
     render(<BackgroundCanvas {...defaultProps} />);
-    
     const container = screen.getByTestId('background-canvas');
-    await user.hover(container);
-    
+    fireEvent.mouseMove(container);
     expect(defaultProps.onMouseMove).toHaveBeenCalled();
   });
 
