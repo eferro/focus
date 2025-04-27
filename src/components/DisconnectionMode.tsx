@@ -80,6 +80,17 @@ const DisconnectionMode: React.FC<DisconnectionModeProps> = ({
     return () => clearInterval(timer);
   }, [timeLeft, DISCONNECTION_TIME, onComplete]);
 
+  // Update document title with countdown
+  useEffect(() => {
+    if (timeLeft > 0) {
+      const timeStr = formatTime(timeLeft);
+      document.title = `${timeStr} - Disconnection`;
+    }
+    return () => {
+      document.title = 'Focus Timer';
+    };
+  }, [timeLeft, formatTime]);
+
   return (
     <div className={`glass p-8 rounded-2xl w-full max-w-md animate-fade-in ${hasMovement ? 'border-red-400' : ''}`}>
       <div className="text-center">

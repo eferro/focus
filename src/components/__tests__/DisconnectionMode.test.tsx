@@ -59,4 +59,16 @@ describe('DisconnectionMode', () => {
     // After reset, timer should go back to full 02:00
     expect(screen.getByText(/02:00/)).toBeInTheDocument();
   });
+
+  it('updates document.title with countdown in Disconnection mode', () => {
+    // On mount, should set title to full time
+    render(<DisconnectionMode task={TASK_TEXT} onComplete={onComplete} onCancel={onCancel} />);
+    expect(document.title).toBe('02:00 - Disconnection');
+    // Advance 1 second
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    // Title should update to 01:59
+    expect(document.title).toMatch(/^01:59 - Disconnection$/);
+  });
 });
