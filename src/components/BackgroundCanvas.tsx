@@ -4,12 +4,10 @@ import { Shuffle } from 'lucide-react';
 import { useBackgroundSound } from '../hooks/useBackgroundSound';
 import AudioControl from './AudioControl';
 
-const TOTAL_PHOTOS = 38;
+import { PHOTOS, TOTAL_PHOTOS } from '../generated/photos';
 
-const getPhotoPath = (index: number) => {
-  const paddedNumber = String(index).padStart(4, '0');
-  return `/focus/photos/photo_${paddedNumber}.webp`;
-};
+// Get photo URL by index (0-based)
+const getPhotoPath = (idx: number) => `/focus/photos/${PHOTOS[idx]}`;
 
 interface BackgroundCanvasProps {
   onMouseMove: () => void;
@@ -18,18 +16,19 @@ interface BackgroundCanvasProps {
 }
 
 const BackgroundCanvas: React.FC<BackgroundCanvasProps> = ({ onMouseMove, onMouseLeave, children }) => {
-  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(() => 
-    Math.floor(Math.random() * TOTAL_PHOTOS) + 1
+  // currentPhotoIndex is 0-based into PHOTOS array
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState<number>(
+    () => Math.floor(Math.random() * TOTAL_PHOTOS)
   );
 
   const { isPlaying, volume, currentSound, sounds, togglePlayback, adjustVolume, changeSound } = useBackgroundSound();
 
   const changeBackground = useCallback(() => {
     setCurrentPhotoIndex(current => {
-      let newIndex = Math.floor(Math.random() * TOTAL_PHOTOS) + 1;
-      // Make sure we don't get the same image twice
+      let newIndex = Math.floor(Math.random() * TOTAL_PHOTOS);
+      // avoid same image twice
       if (newIndex === current && TOTAL_PHOTOS > 1) {
-        newIndex = (newIndex % TOTAL_PHOTOS) + 1;
+        newIndex = (current + 1) % TOTAL_PHOTOS;
       }
       return newIndex;
     });

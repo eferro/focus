@@ -98,6 +98,18 @@ npm run build
 npm run deploy
 ```
 
+## 🖼️ Photos Management
+
+When you add new JPEG photos to `public/photos`, optimize and register them with:
+
+```sh
+# 1. Convert and optimize new JPEGs to WebP
+npm run photos:optimize
+
+# 2. Regenerate the photo index for the carousel
+npm run photos:generate
+```
+
 ## 🤝 Contributing
 
 Contributions are welcome! Feel free to open issues and submit pull requests.
