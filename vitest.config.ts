@@ -22,6 +22,9 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      // Stub Radix UI packages for testing
+      '@radix-ui/react-checkbox': path.resolve(__dirname, './src/__mocks__/radix-checkbox.ts'),
+      '@radix-ui/react-switch': path.resolve(__dirname, './src/__mocks__/radix-switch.ts'),
     },
   },
 }); 
